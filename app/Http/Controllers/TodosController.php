@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Todo;
 use Illuminate\Http\Request;
 
-class TodoController extends Controller
+class TodosController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,18 +14,9 @@ class TodoController extends Controller
      */
     public function index()
     {
-        //
+        return Todo::all();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -35,7 +26,12 @@ class TodoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+          'title'=>'required|string',
+          'completed'=>'required|boolean'
+        ]);
+        $todo = Todo::create($data);
+        return response($todo,201);
     }
 
     /**
@@ -49,16 +45,6 @@ class TodoController extends Controller
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Todo  $todo
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Todo $todo)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -69,7 +55,12 @@ class TodoController extends Controller
      */
     public function update(Request $request, Todo $todo)
     {
-        //
+      $data = $request->validate([
+        'title'=>'required|string',
+        'completed'=>'required|boolean'
+      ]);
+      $todo->update($data);
+      return response($todo,200);
     }
 
     /**
@@ -80,6 +71,22 @@ class TodoController extends Controller
      */
     public function destroy(Todo $todo)
     {
-        //
+        $todo->delete();
+        return response("Deleted todo item.",200);
+    }
+
+    public function updateAll(Request $request){
+      $data = $request->validate([
+        'completed'=>'required|boolean'
+      ]);
+      Todo::query()->update($data);
+      return response('Updated',200);
+    }
+    public function destroyCompleted(Request $request){
+      $data = $request->validate([
+        'todos'=>'required|array'
+      ]);
+      Todo::destroy($request->todos);
+      return response("Deleted.",200);
     }
 }
